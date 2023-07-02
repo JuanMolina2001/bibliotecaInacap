@@ -5,6 +5,9 @@ class Prestamo:
         self.__id_ejemplar = id_ejemplar
         self.__fecha_prestamo = fecha_prestamo
         self.__fecha_devolucion = fecha_devolucion
+        self.__nombre = None
+        self.__apellido = None
+        self.__titulo = None
     def getId_prestamo(self):
         return self.__id_prestamo
     def setId_prestamo(self,id_prestamo):
@@ -29,4 +32,15 @@ class Prestamo:
         self.__fecha_devolucion = fecha_devolucion
     def getFecha_devolucion(self):
         return self.__fecha_devolucion
-    
+    def setNombre(self, nombre):
+        self.__nombre = nombre
+    def getNombre(self):
+        return self.__nombre
+    def setApellido(self, apellido):
+        self.__apellido = apellido
+    def getApellido(self):
+        return self.__apellido
+    def setTitulo(self,titulo):
+        self.__titulo = titulo
+    def getTitulo(self):
+        return self.__titulo

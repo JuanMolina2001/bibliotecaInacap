@@ -56,7 +56,7 @@ def buscarUnUsuario(hacer_prestamo = False):
     while opcion < 1 or opcion > 2:
         opcion = input_int("Selecciona una opción: ")
         if opcion == 1:
-            rut = input_int("Ingresa el Rut del Usuario a buscar: ")
+            rut = input_int("Ingrese el rut del Usuario sin puntos ni guion a buscar: ")
             where = "rut = " + str(rut)
             usuarios = buscar_usuario(where) 
             break
@@ -94,7 +94,7 @@ def buscarUnUsuario(hacer_prestamo = False):
         if opcion == 1:
             rut = usuario.getRut()
         else:
-            rut = input_int("Ingresa el Rut del Usuario: ")
+            rut = input_int("Ingrese el rut del Usuario sin puntos ni guion: ")
         return rut
     else:
         menu_Usuarios()
@@ -202,17 +202,37 @@ def agregarUnEjemplar(id_libro):
 #//////////////////////////////// prestamo funciones///////////////////////////////////////
 def crearPrestamo():
     hacer_prestamo = True
-    rut = buscarUnUsuario(hacer_prestamo)
-    tipo = tipoUsuario(rut)
+    while True :
+        rut = buscarUnUsuario(hacer_prestamo)
+        tipo = tipoUsuario(rut)
+        if tipo == "docente": 
+            cantidad_Prestamo = cantidadPrestamo(rut)
+            if cantidad_Prestamo == 2: #cambiar por cantidad de prestamos disponibles docente
+                print('el usuario ya a sobrepasado la cantidad de prestamos disponibles: '+ str(cantidad_Prestamo))
+                opcion = input_int('desea buscar a otro usuario: \n 1.- si \n 2.- no \n')
+                if opcion == 2: 
+                    menu_prestamo()
+                    break
+            else:
+                diasDevolucion = 14 #cambiar por cantidad dias para devolver el libro docente
+                break
+
+        elif tipo == "estudiante":
+            cantidad_Prestamo = cantidadPrestamo(rut)
+            if cantidad_Prestamo == 1: #cambiar por cantidad de prestamos disponibles estudiante
+                print('el '+ tipo +' ya a sobrepasado la cantidad de prestamos disponibles: '+ str(cantidad_Prestamo))
+                opcion = input_int('desea buscar a otro usuario: \n 1.- si \n 2.- no \n')
+                if opcion == 2: 
+                    menu_prestamo()
+                    break
+            else:
+                diasDevolucion = 7 #cambiar por cantidad dias para devolver el libro docente
+                break
     id_ejemplar = None
     while id_ejemplar == None:
         id_libro = buscarUnLibro(hacer_prestamo)
         id_ejemplar = seleccionarEjemplar(id_libro)
     id_prestamo = None
-    if tipo == "docente": 
-        diasDevolucion = 14
-    elif tipo == "estudiante":
-        diasDevolucion = 7
     fecha_prestamo = datetime.now().date()
     fecha_devolucion = fecha_prestamo + timedelta(days=diasDevolucion)
     aceptar = input_int('¿Desea realizar el prestamo?: \n 1.- Si \n 2.- no \n')
@@ -224,9 +244,29 @@ def crearPrestamo():
     else:
         print('prestamo no realizado')
     menu_prestamo()
+
+def mostrarPrestamos():
+    prestamos = mostrarTodosPrestamos()
+
+    datos = []
+    for prestamo in prestamos:
+        datos.append([
+            prestamo.getNombre(),
+            prestamo.getApellido(),
+            prestamo.getTitulo(),
+            prestamo.getFecha_prestamo(),
+            prestamo.getFecha_devolucion(),
+        ])
+
+    headers = ['Nombre', 'Apellido', 'Titulo', 'Fecha_prestamo', 'Fecha_devolucion']
+
+    print(tabulate(datos, headers, tablefmt="grid"))
+    menu_prestamo()
 def ModificarPrestamo():
     pass
 def TerminarPrestamo():
+    pass
+def buscarUnUsuario():
     pass
 # ///////////////////////////////// menus ////////////////////////////////////////////////
 def input_int(mensaje):
@@ -284,8 +324,7 @@ def menu_libros():
             buscarUnLibro()
             break
         elif opcion == 4:
-            print("¡Hasta luego!")
-            close_connection()
+            menu()
             break
         else:
             print("Opción inválida. Por favor, selecciona una opción válida.")
@@ -296,8 +335,9 @@ def menu_prestamo():
         print("1. hacer un prestamo")
         print("2. Modificar prestamo")
         print("3. Terminar prestamo")
-        print("4. Salir")
-
+        print("4. Mostrar los prestamos")
+        print("5. Buscar un prestamo")
+        print("6. Salir")
         opcion = input_int("Selecciona una opción: ")
 
         if opcion == 1:
@@ -310,7 +350,13 @@ def menu_prestamo():
             TerminarPrestamo()
             break
         elif opcion == 4:
-            menu()
+            mostrarPrestamos()
+            break
+        elif opcion == 5:
+            buscarPrestamo()
+            break
+        elif opcion == 6:
+            menu_prestamo
             break
         else:
             print("Opción inválida. Por favor, selecciona una opción válida.")
