@@ -57,3 +57,17 @@ def buscar_usuario(where):
     conexion.close()
 
     return usuarios
+
+def tipoUsuario(rut):
+    conexion = get_connection()
+    cursor = conexion.cursor()
+    consulta = "SELECT tipo_usuario from usuario WHERE rut = %s"
+    valores = (rut,)
+    cursor.execute(consulta, valores)
+    for row in cursor:
+        tipo_usuario = row[0]
+
+    cursor.close()
+    conexion.close()
+
+    return tipo_usuario

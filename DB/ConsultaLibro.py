@@ -81,3 +81,23 @@ def buscar_Libro(where):
     conexion.close()
 
     return libros
+def ejemplarPrestamo(id_ejemplar):
+    conexion = get_connection()
+    cursor = conexion.cursor()
+    consulta = "UPDATE `ejemplar` SET `estado` = 'En préstamo' WHERE `ejemplar`.`id_ejemplar` = %s;"
+    valores = (id_ejemplar,)
+    cursor.execute(consulta, valores)
+    conexion.commit()
+    cursor.close()
+    conexion.close()
+
+    
+def ejemplarDisponible(id_ejemplar):
+    conexion = get_connection()
+    cursor = conexion.cursor()
+    consulta = "UPDATE `ejemplar` SET `estado` = 'Disponible' WHERE `ejemplar`.`id_ejemplar` = %s;"
+    valores = (id_ejemplar,)
+    cursor.execute(consulta, valores)
+    conexion.commit()
+    cursor.close()
+    conexion.close()

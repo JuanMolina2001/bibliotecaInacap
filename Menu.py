@@ -5,7 +5,9 @@ from tabulate import tabulate
 from objetos.UsuarioObj import *
 from DB.ConsultaUsuario import *
 from DB.conexion import close_connection
-from objetos.prestamoObj import Prestamo
+from DB.ConsultaPrestamo import *
+from objetos.prestamoObj import *
+from datetime import datetime , timedelta
 
 # ///////////////////////////////// funciones usuarios ////////////////////////////////////////////////
 def ingresarUsuario():
@@ -46,21 +48,25 @@ def mostrarUsuarios():
     print(tabla)
     menu_Usuarios()
 
-def buscarUnUsuario():
+def buscarUnUsuario(hacer_prestamo = False):
+    opcion = 0
     print("Cómo desea buscar el Usuario")
     print("1. Por Rut")
     print("2. Por Nombre")
-    opcion = input_int("Selecciona una opción: ")
-
-    if opcion == 1:
-        rut = input_int("Ingresa el Rut del Usuario a buscar: ")
-        where = "rut = " + str(rut)
-        usuarios = buscar_usuario(where) 
-
-    elif opcion == 2:
-        nombre = input("Ingresa el Nombre del Usuario a buscar: ")
-        where = "nombre LIKE CONCAT('%', '" + nombre + "', '%')"
-        usuarios = buscar_usuario(where)
+    while opcion < 1 or opcion > 2:
+        opcion = input_int("Selecciona una opción: ")
+        if opcion == 1:
+            rut = input_int("Ingresa el Rut del Usuario a buscar: ")
+            where = "rut = " + str(rut)
+            usuarios = buscar_usuario(where) 
+            break
+        elif opcion == 2:
+            nombre = input("Ingresa el Nombre del Usuario a buscar: ")
+            where = "nombre LIKE CONCAT('%', '" + nombre + "', '%')"
+            usuarios = buscar_usuario(where)
+            break
+        else: 
+            print("Opcion no valida")
     
     if usuarios:
         table = []
@@ -77,9 +83,20 @@ def buscarUnUsuario():
         headers = ['nombre', 'apellido', 'rut', 'tipo usuario', 'correo', 'numero telefono']
 
         print(tabulate(table, headers=headers, tablefmt="grid"))
-        menu_Usuarios()
+
     else:
         print('No se enecontro ningun Usurio')
+        if hacer_prestamo == False:
+            menu_Usuarios()
+        else:
+            menu_prestamo()
+    if hacer_prestamo == True:
+        if opcion == 1:
+            rut = usuario.getRut()
+        else:
+            rut = input_int("Ingresa el Rut del Usuario: ")
+        return rut
+    else:
         menu_Usuarios()
 # ///////////////////////////////// funciones Libros ////////////////////////////////////////////////
 
@@ -117,21 +134,24 @@ def mostrarLibros():
     menu_libros()
 
     
-def buscarUnLibro(hacer_prestamo):
+def buscarUnLibro(hacer_prestamo = False):
     print("Cómo desea buscar el libro")
     print("1. Por Id")
     print("2. Por Título")
-    opcion = input_int("Selecciona una opción: ")
+    opcion = 0
+    while opcion < 1 or opcion > 2:
+        opcion = input_int("Selecciona una opción: ")
+        if opcion == 1:
+            id_libro = input_int("Ingresa el ID del libro a buscar: ")
+            where = "l.id_libro = " + str(id_libro)
+            libros = buscar_Libro(where) 
 
-    if opcion == 1:
-        id_libro = input_int("Ingresa el ID del libro a buscar: ")
-        where = "l.id_libro = " + str(id_libro)
-        libros = buscar_Libro(where) 
-
-    elif opcion == 2:
-        titulo_libro = input("Ingresa el Título del libro a buscar: ")
-        where = "l.titulo LIKE CONCAT('%', '" + titulo_libro + "', '%')"
-        libros = buscar_Libro(where)
+        elif opcion == 2:
+            titulo_libro = input("Ingresa el Título del libro a buscar: ")
+            where = "l.titulo LIKE CONCAT('%', '" + titulo_libro + "', '%')"
+            libros = buscar_Libro(where)
+        else:
+            print('Opcion no valida')
     
     if libros:
         table = []
@@ -166,8 +186,12 @@ def buscarUnLibro(hacer_prestamo):
             print('Ejemplar agregado')
             agergarejemplar = input_int("¿Desea agregar otro ejemplar? : \n 1.- si \n 2.- no\n")
         menu_libros()
-
-
+    else:
+        if opcion == 1:
+            id_libro = libro.getId_libro()
+        elif opcion == 2:
+            id_libro = input_int('ingrese el id del libro: ')
+        return id_libro    
 
 def agregarUnEjemplar(id_libro):
     id_ejemplar = ' '
@@ -178,18 +202,32 @@ def agregarUnEjemplar(id_libro):
 #//////////////////////////////// prestamo funciones///////////////////////////////////////
 def crearPrestamo():
     hacer_prestamo = True
-    buscarUnUsuario()
+    rut = buscarUnUsuario(hacer_prestamo)
+    tipo = tipoUsuario(rut)
+    id_ejemplar = None
+    while id_ejemplar == None:
+        id_libro = buscarUnLibro(hacer_prestamo)
+        id_ejemplar = seleccionarEjemplar(id_libro)
     id_prestamo = None
-    rut = input_int("ingrese el rut del usuario")
-    buscar_Libro(hacer_prestamo)
-    id_ejemplar = input("Ingrese el autor del libro: ")
-    fecha_prestamo = input("Ingrese el título del libro: ")
-    prestamo = Prestamo(id_prestamo, rut, id_ejemplar, fecha_prestamo)
-
-
-    
-
-
+    if tipo == "docente": 
+        diasDevolucion = 14
+    elif tipo == "estudiante":
+        diasDevolucion = 7
+    fecha_prestamo = datetime.now().date()
+    fecha_devolucion = fecha_prestamo + timedelta(days=diasDevolucion)
+    aceptar = input_int('¿Desea realizar el prestamo?: \n 1.- Si \n 2.- no \n')
+    if aceptar == 1:
+        prestamo = Prestamo(id_prestamo, rut, id_ejemplar, fecha_prestamo, fecha_devolucion)
+        hacerPrestamo(prestamo)
+        ejemplarPrestamo(id_ejemplar)
+        print('prestamo ingresado Correctamente')
+    else:
+        print('prestamo no realizado')
+    menu_prestamo()
+def ModificarPrestamo():
+    pass
+def TerminarPrestamo():
+    pass
 # ///////////////////////////////// menus ////////////////////////////////////////////////
 def input_int(mensaje):
     while True:
@@ -252,13 +290,38 @@ def menu_libros():
         else:
             print("Opción inválida. Por favor, selecciona una opción válida.")
 
+def menu_prestamo():
+    while True:
+        print("===== Menu Prestamos =====")
+        print("1. hacer un prestamo")
+        print("2. Modificar prestamo")
+        print("3. Terminar prestamo")
+        print("4. Salir")
+
+        opcion = input_int("Selecciona una opción: ")
+
+        if opcion == 1:
+            crearPrestamo()
+            break
+        elif opcion == 2:
+            ModificarPrestamo()
+            break
+        elif opcion == 3:
+            TerminarPrestamo()
+            break
+        elif opcion == 4:
+            menu()
+            break
+        else:
+            print("Opción inválida. Por favor, selecciona una opción válida.")
 
 def menu():
     while True:
         print("===== Menu Biblioteca =====")
         print("1. Administrar libros")
-        print("2. administrar usuarios")
-        print("3. Salir")
+        print("2. Administrar usuarios")
+        print("3. Administrar prestamos")
+        print("4. Salir")
 
         opcion = input_int("Selecciona una opción: ")
 
@@ -269,6 +332,9 @@ def menu():
             menu_Usuarios()
             break
         elif opcion == 3:
+            menu_prestamo()
+            break
+        elif opcion == 4:
             print("¡Hasta luego!")
             break
             close_connection()
