@@ -27,17 +27,20 @@ class Administrador(Persona):
         self.__contrasena = contrasena
 
 class Time():
-    def __init__(self,fecha_in,fecha_out):
+    def __init__(self,rut,fecha_in,fecha_out):
         self.__fecha_in = fecha_in
         self.__fecha_out = fecha_out
+        self.__rut = rut
     def getFecha_in(self):
         return self.__fecha_in
     def setFecha_in(self,fecha_in):
         self.__fecha_in = fecha_in
     def getFecha_out(self):
         return self.__fecha_out
-    def setFecha_out(self,fecha_out):
-        self.__fecha_out = fecha_out
+    def setRut(self,rut):
+        self.__rut = rut
+    def getRut(self):
+        return self.__rut
 
 class Usuario(Persona):
     def __init__(self,nombre, apellido, rut,tipo_usuario, correo, numero_telefono):

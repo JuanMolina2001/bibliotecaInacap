@@ -96,20 +96,11 @@ def ingresarAdmin(administrador):
     cursor.execute(consulta, valores)
     conexion.commit()
 
-def ingresarFeachaInicio(time, administrador):
+def registro(time):
     conexion = get_connection()
     cursor = conexion.cursor()
-    consulta = "INSERT INTO `time` (`time_id`, `hora_ingreso`, `hora_salida`, `rut_admin`) VALUES (NULL, %s, NULL, '%s')"
-    valores = (time.getFecha_in(), administrador.getRut())
-    cursor.execute(consulta, valores)
-    conexion.commit()
-
-
-def ingresarFeachaSalida(time):
-    conexion = get_connection()
-    cursor = conexion.cursor()
-    consulta = "UPDATE `time` SET `hora_salida` = %s WHERE DATE(hora_ingreso) = %s AND hora_salida IS NULL;"
-    valores = (time.getFecha_out(), time.getFecha_in())
+    consulta = "INSERT INTO `time` (`time_id`, `hora_ingreso`, `hora_salida`, `rut_admin`) VALUES (NULL, %s, %s, '%s')"
+    valores = (time.getFecha_in(),time.getFecha_out(),time.getRut())
     cursor.execute(consulta, valores)
     conexion.commit()
 

@@ -28,6 +28,9 @@ def input_int(mensaje):
         except ValueError:
             print("Error: Debes ingresar una opcion válida.")
 
+rutAdmin = None
+fechaInicial = None
+
 # ///////////////////////////////// funciones admin ////////////////////////////////////////////////
 def registrar():
     print("Ingrese sus datos para registrarse")
@@ -44,6 +47,7 @@ def registrar():
     log_in()
     
 def log_in():
+        global rutAdmin, fechaInicial
         print("Ingrese sus datos para loguearse")
         rut = input_int("ingrese su Rut: \n")
         contrasena = input("ingrese su Contraseña: \n")
@@ -51,10 +55,10 @@ def log_in():
         administrador = Administrador(None,None,rut,contrasenaHash)
         if verificarAdmin(administrador) == True:
             fecha_in = date_Today()
-            fecha_out = None
-            time = Time(fecha_in, fecha_out)
-            ingresarFeachaInicio(time, administrador)
+            fechaInicial = fecha_in
+            rutAdmin = rut
             print("Sesion iniciada")
+            print(fechaInicial)
             subMenu_admin()
             return rut
         else:
@@ -62,10 +66,11 @@ def log_in():
             menu_admin()
         
 def log_out():
+    global rutAdmin, fechaInicial
     fecha_out = date_Today()
-    fecha_in = date.today().strftime("%Y-%m-%d")
-    time = Time(fecha_in, fecha_out)
-    ingresarFeachaSalida(time)
+    print(fechaInicial)
+    time = Time(rutAdmin,fechaInicial, fecha_out)
+    registro(time)
 
 # ///////////////////////////////// funciones usuarios ////////////////////////////////////////////////
 def ingresarUsuario():
@@ -525,4 +530,4 @@ def subMenu_admin():
         else:
             print("Opción inválida. Por favor, selecciona una opción válida.")
 
-buscarPrestamo()
+log_in()
