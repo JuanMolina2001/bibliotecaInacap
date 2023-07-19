@@ -107,15 +107,16 @@ def registro(time):
 def verificarRut(rut):
     conexion = get_connection()
     cursor = conexion.cursor()
-    consulta = "SELECT rut FROM `administrador` WHERE rut = "+ str(rut) +";"
-    cursor.execute(consulta)
-    rutConsulta= None
+    consulta = "SELECT rut FROM `administrador` WHERE rut = %s;"
+    cursor.execute(consulta, (rut,))
+    rutConsulta = None
     for row in cursor:
         rutConsulta = row[0]
         break
     conexion.close()
-    if  rutConsulta == rut:
+    if rutConsulta == rut:
         registrado = True
     else:
         registrado = False
+
     return registrado

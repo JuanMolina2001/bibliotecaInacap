@@ -9,6 +9,8 @@ class Prestamo:
         self.__nombre = None
         self.__apellido = None
         self.__titulo = None
+        self.__renovacion = None
+        self.__r_fecha_devolucion = None
     def getId_prestamo(self):
         return self.__id_prestamo
     def setId_prestamo(self,id_prestamo):
@@ -49,3 +51,11 @@ class Prestamo:
         self.__estado = estado
     def getEstado(self):
         return self.__estado
+    def setRenovacion(self,renovacion):
+        self.__renovacion = renovacion
+    def setR_fecha_devolucion(self,r_fecha_devolucion):
+        self.__r_fecha_devolucion = r_fecha_devolucion
+    def getRenovacion(self):
+        return self.__renovacion
+    def getR_fecha_devolucion(self):
+        return self.__r_fecha_devolucion
