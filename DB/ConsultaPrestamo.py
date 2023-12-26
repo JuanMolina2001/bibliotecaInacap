@@ -4,7 +4,7 @@ from datetime import datetime , timedelta, date
 def hacerPrestamo(prestamo):
     conexion = get_connection()
     cursor = conexion.cursor()
-    consulta = "INSERT INTO `prestamo` (`id_prestamo`, `rut`, `id_ejemplar`, `fecha_prestamo`, `fecha_devolucion`, `estado`) VALUES (%s, %s, %s, %s, %s,'no terminado');"
+    consulta = "INSERT INTO `prestamo` (`id_prestamo`, `rut`, `id_ejemplar`, `fecha_prestamo`, `fecha_devolucion`, `estado`) VALUES (?, ?, ?, ?, ?,0);"
     valores = (prestamo.getId_prestamo(),prestamo.getRut(),prestamo.getId_ejemplar(),prestamo.getFecha_prestamo(),prestamo.getFecha_devolucion())
     cursor.execute(consulta, valores)
     conexion.commit()
@@ -14,7 +14,7 @@ def hacerPrestamo(prestamo):
 def cantidadPrestamo(rut):
     conexion = get_connection()
     cursor = conexion.cursor()
-    consulta = "SELECT COUNT(*) AS total_prestamos FROM prestamo WHERE rut = %s;"
+    consulta = "SELECT COUNT(*) AS total_prestamos FROM prestamo WHERE rut = ?;"
     valores = (rut,)
     cursor.execute(consulta, valores)
     resultado = cursor.fetchone()
@@ -29,7 +29,7 @@ def cantidadPrestamo(rut):
 def seleccionarEjemplar(id_libro):
     conexion = get_connection()
     cursor = conexion.cursor()
-    consulta = "SELECT id_ejemplar FROM ejemplar WHERE id_libro = %s AND estado = 'Disponible'"
+    consulta = "SELECT id_ejemplar FROM ejemplar WHERE id_libro = ? AND estado = 1"
     valores = (id_libro,)
     cursor.execute(consulta, valores)
 
@@ -87,7 +87,7 @@ def Buscar_Prestamo(where):
     conexion = get_connection()
     cursor = conexion.cursor()
 
-    consulta = "SELECT p.id_prestamo, p.rut, p.id_ejemplar, p.fecha_prestamo, p.fecha_devolucion, u.nombre, u.apellido, l.titulo, p.estado, COUNT(r.dias_devolucion) AS cantidad_renovacion, sum(r.dias_devolucion) as dias_devolucion FROM prestamo p INNER JOIN usuario u ON p.rut = u.rut INNER JOIN ejemplar e ON p.id_ejemplar = e.id_ejemplar INNER JOIN libro l ON e.id_libro = l.id_libro LEFT JOIN renovacion r ON p.id_prestamo = r.id_prestamo WHERE p.rut = %s GROUP by p.id_prestamo;;"
+    consulta = "SELECT p.id_prestamo, p.rut, p.id_ejemplar, p.fecha_prestamo, p.fecha_devolucion, u.nombre, u.apellido, l.titulo, p.estado, COUNT(r.dias_devolucion) AS cantidad_renovacion, sum(r.dias_devolucion) as dias_devolucion FROM prestamo p INNER JOIN usuario u ON p.rut = u.rut INNER JOIN ejemplar e ON p.id_ejemplar = e.id_ejemplar INNER JOIN libro l ON e.id_libro = l.id_libro LEFT JOIN renovacion r ON p.id_prestamo = r.id_prestamo WHERE p.rut = ? GROUP by p.id_prestamo;;"
     valores = (where,)
     cursor.execute(consulta,valores)
 
@@ -124,7 +124,7 @@ def Buscar_Prestamo(where):
 def TerminarPrestamo(id_prestamo):
     conexion = get_connection()
     cursor = conexion.cursor()
-    consulta = "UPDATE `prestamo` SET `estado` = 'terminado' WHERE `prestamo`.`id_prestamo` = %s;"
+    consulta = "UPDATE `prestamo` SET `estado` = 'terminado' WHERE `prestamo`.`id_prestamo` = ?;"
     valores = (id_prestamo,)
     cursor.execute(consulta, valores)
     conexion.commit()
@@ -135,7 +135,7 @@ def TerminarPrestamo(id_prestamo):
 def UpPrestamo(id_prestamo,valor,cambio):
     conexion = get_connection()
     cursor = conexion.cursor()
-    consulta = "UPDATE `prestamo` SET "+ cambio +" = %s WHERE `prestamo`.`id_prestamo` = %s;"
+    consulta = "UPDATE `prestamo` SET "+ cambio +" = ? WHERE `prestamo`.`id_prestamo` = ?;"
     valores = (valor,id_prestamo,)
     cursor.execute(consulta, valores)
     conexion.commit()
@@ -145,7 +145,7 @@ def UpPrestamo(id_prestamo,valor,cambio):
 def rutPorId(id_prestamo):
     conexion = get_connection()
     cursor = conexion.cursor()
-    consulta = "select rut from prestamo where id_prestamo = %s"
+    consulta = "select rut from prestamo where id_prestamo = ?"
     valores = (id_prestamo,)
     cursor.execute(consulta,valores,)
    
@@ -160,7 +160,7 @@ def rutPorId(id_prestamo):
 def cantidadRenovaciones(id_prestamo):
     conexion = get_connection()
     cursor = conexion.cursor()
-    consulta = "select COUNT(id_renovacion) as cantidadRenovaciones from renovacion where id_prestamo = %s "
+    consulta = "select COUNT(id_renovacion) as cantidadRenovaciones from renovacion where id_prestamo = ? "
     valores = (id_prestamo,)
     cursor.execute(consulta,valores,)
    
@@ -175,7 +175,7 @@ def cantidadRenovaciones(id_prestamo):
 def agregarRenovacion(id_prestamo):
     conexion = get_connection()
     cursor = conexion.cursor()
-    consulta = "INSERT INTO `renovacion` (`id_renovacion`, `id_prestamo`, `dias_devolucion`) VALUES (NULL, %s, '3')"
+    consulta = "INSERT INTO `renovacion` (`id_renovacion`, `id_prestamo`, `dias_devolucion`) VALUES (NULL, ?, '3')"
     valores = (id_prestamo,)
     cursor.execute(consulta,valores,)
     conexion.commit()
@@ -186,7 +186,7 @@ def agregarRenovacion(id_prestamo):
 def cantidadLibroRenovado(rut):
     conexion = get_connection()
     cursor = conexion.cursor()
-    consulta = "SELECT COUNT(DISTINCT e.id_ejemplar) AS cantidad_ejemplares_renovacion FROM renovacion AS r INNER JOIN prestamo AS p ON p.id_prestamo = r.id_prestamo INNER JOIN ejemplar AS e ON e.id_ejemplar = p.id_ejemplar WHERE p.rut = %s;"
+    consulta = "SELECT COUNT(DISTINCT e.id_ejemplar) AS cantidad_ejemplares_renovacion FROM renovacion AS r INNER JOIN prestamo AS p ON p.id_prestamo = r.id_prestamo INNER JOIN ejemplar AS e ON e.id_ejemplar = p.id_ejemplar WHERE p.rut = ?;"
     valores = (rut,)
     cursor.execute(consulta,valores,)
     for row in cursor:

@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 def ingresarMulta(multa):
     conexion = get_connection()
     cursor = conexion.cursor()
-    consulta = "INSERT INTO `multa` (`id_multa`, `monto`, `id_prestamo`, `fecha_multa`, `estado`) VALUES (NULL, %s, %s, %s, 'no pagado')"
+    consulta = "INSERT INTO `multa` (`id_multa`, `monto`, `id_prestamo`, `fecha_multa`, `estado`) VALUES (NULL, ?, ?, ?, 'no pagado')"
     valores = (multa.getMonto(),multa.getId_prestamo(),multa.getFecha_multa())
     cursor.execute(consulta, valores)
     conexion.commit()
@@ -24,7 +24,7 @@ def ConsultaPrestamos():
 def consultaMultaRut(rut):
     conexion = get_connection()
     cursor = conexion.cursor()
-    consulta = "SELECT sum(m.monto) FROM multa m JOIN prestamo AS p ON p.id_prestamo = m.id_prestamo WHERE p.rut = %s GROUP BY p.rut"
+    consulta = "SELECT sum(m.monto) FROM multa m JOIN prestamo AS p ON p.id_prestamo = m.id_prestamo WHERE p.rut = ? GROUP BY p.rut"
     valores = (rut,)
     cursor.execute(consulta,valores,)
     for row in cursor:
@@ -38,7 +38,7 @@ def consultaMultaRut(rut):
 def buscarMulta(rut):
     conexion = get_connection()
     cursor = conexion.cursor()
-    consulta = "SELECT  p.id_prestamo, u.nombre, u.apellido, p.rut,l.titulo, m.monto, m.estado, m.fecha_multa FROM  prestamo  p LEFT JOIN multa AS m ON m.id_prestamo = p.id_prestamo JOIN usuario AS u ON p.rut = u.rut JOIN ejemplar AS e ON e.id_ejemplar = p.id_ejemplar JOIN libro AS l ON l.id_libro = e.id_libro WHERE p.rut = %s"
+    consulta = "SELECT  p.id_prestamo, u.nombre, u.apellido, p.rut,l.titulo, m.monto, m.estado, m.fecha_multa FROM  prestamo  p LEFT JOIN multa AS m ON m.id_prestamo = p.id_prestamo JOIN usuario AS u ON p.rut = u.rut JOIN ejemplar AS e ON e.id_ejemplar = p.id_ejemplar JOIN libro AS l ON l.id_libro = e.id_libro WHERE p.rut = ?"
     valores = (rut,)
     cursor.execute(consulta,valores,)
     datos = []
@@ -66,7 +66,7 @@ def buscarMulta(rut):
 def pagar_multa(id_prestamo):
     conexion = get_connection()
     cursor = conexion.cursor()
-    consulta = "UPDATE `multa` SET `estado` = 'pagado' WHERE `multa`.`id_prestamo` = %s;"
+    consulta = "UPDATE `multa` SET `estado` = 'pagado' WHERE `multa`.`id_prestamo` = ?;"
     valores = (id_prestamo,)
     cursor.execute(consulta, valores)
     conexion.commit()

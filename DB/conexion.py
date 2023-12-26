@@ -1,7 +1,7 @@
-import mysql.connector
+import sqlite3
+import os
 def get_connection():
-    connection = mysql.connector.connect(host = 'localhost',database = 'biblioteca',user = 'root',password = '')
+    path = os.path.abspath(os.getcwd())+'/DB/libros.sqlite3'
+    connection = sqlite3.connect(path)
     return connection
-def close_connection(connection):
-    if connection:
-        connection.close()
+
